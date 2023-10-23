@@ -243,11 +243,14 @@ router.put("/allreset", async function(req, res, next){
     }
 })
 
-router.put("/:uid/clearOwed", async function(req, res, next){
-    const customerId = req.body.cid
+router.put("/:uid/pay-owed", async function(req, res, next){
+    const userId = req.params.uid
+    const amountOwed = req.body.amountOwed
+    const amountOwing = req.body.amountOwing
     try{
-        const user = await Users.findById(customerId)
-        user.amountOwed = 0
+        const user = await Users.findById(userId)
+        user.amountOwed = amountOwed
+        user.amountOwing = amountOwing
         try{
             await user.save()
             res.status(201).json({message: "successfully cleared cleared your debt", user: user})
