@@ -22,8 +22,11 @@ const productSchema = mongoose.Schema({
         default: 0,
     },
     image: {
-        type: String,
-        default: "image unavailable at the moment"
+        data: Buffer,
+        contentType: String,
+        filename: String
+        // type: String,
+        // default: null
     },
     boughtCount: {
         type: Number,

@@ -1,12 +1,28 @@
 'use strict';
 
 const express = require("express");
+const multer = require('multer')
+// const upload = multer({dest: "uploads"})
+const fs = require('fs')
+const path = require('path')
 const Products = require("./models/products");
 const Users = require("./models/Users").Users
 const Prods = require("./models/Users").Prods
 const Cart = require("./models/Users").Cart
 const Stocks = require("./models/stock")
 const router = express.Router();
+
+
+const storage = multer.diskStorage({
+    destination: (req, res, cb) => {
+        cb(null, 'uploads/')
+    },
+    filename: (req, file, cb) => {
+        cb(null, file.fieldname + "-" + Date.now())
+    }
+})
+
+const upload = multer({storage: storage})
 
 router.get("/", function(req, res, next){
     // res.json({feedback: "this is a product for number product"});
@@ -19,20 +35,28 @@ router.get("/", function(req, res, next){
     })
 });
 
-router.post("/", function(req, res, next){
-    console.log("the post route has been hit")
+
+router.post("/", upload.single('image'), async function(req, res, next){
+    console.log("the post route has been hit again")
+    // console.log(req.file.filename)
+    console.log(req.body)
     const name = req.body.name
     const price = req.body.price
     const quantity = req.body.quantity
-    const image = req.body.image
+    const category = req.body.category
 
-    console.log(name, price, quantity, image)
+    // console.log(name, price, quantity, image)
 
-    Products.create({
+    await Products.create({
         name: name,
         price: price,
         quantity: quantity,
-        image: image
+        category: category,
+        image: req.file ? {
+            data: fs.readFileSync('uploads/' + req.file.filename),
+            conteType: 'image/jpg',
+            filename: req.file.filename
+        } : "null" 
     })
     .then(product => {
         res.status(200).json({product: product})
@@ -42,27 +66,55 @@ router.post("/", function(req, res, next){
     })
 })
 
-router.put("/:pid/update", async function(req, res, next){
+router.put("/:pid/update", upload.single("image"), async function(req, res, next){
     const productId = req.params.pid
     const name = req.body.name
     const price = req.body.price
     const quantity = req.body.quantity
-    const image = req.body.image
+    const category = req.body.category
+    console.log(req.file)
+    // const image = req.body.image
 
-    try{
-        // const product = await Products.findOneAndUpdate({_id: productId}, {$set: {name: name, price: price, quantity: quantity, image: image}})
-        // res.status(201).json({message: "Successfully Updated", product: product})
+    // const product = await Products.findById(productId)
+    // console.log(product.image.filename)
+    if (req.file){
+        try{
         const product = await Products.findById(productId)
+        fs.unlinkSync(__dirname + '/uploads/' + product.image.filename)
         product.name = name
         product.price = price
         product.quantity = quantity
-        product.image = image
+        product.category = category
+        product.image = {
+            data: fs.readFileSync('uploads/' + req.file.filename),
+            conteType: 'image/jpg',
+            filename: req.file.filename
+        }
         await product.save()
         res.status(201).json({message: "Successfully Updated", product: product})
+        }
+        catch(error){
+            next(error)
+        }
     }
-    catch(error){
-        next(error)
+    else{
+        try{
+            const product = await Products.findById(productId)
+            product.name = name
+            product.price = price
+            product.quantity = quantity
+            product.category = category
+            await product.save()
+            res.status(201).json({message: "Successfully Updated", product: product})
+            }
+            catch(error){
+                next(error)
+            }
     }
+    // try{
+        // const product = await Products.findOneAndUpdate({_id: productId}, {$set: {name: name, price: price, quantity: quantity, image: image}})
+        // res.status(201).json({message: "Successfully Updated", product: product})
+    //     
     
     
 })
@@ -170,7 +222,6 @@ router.post("/addtotimeline", async function(req, res, next){
         }
     })
 })
-
 
 router.put("/makedeposit", async function(req, res, next){
     const customerId = req.body.id

@@ -13,6 +13,7 @@ const app = express();
 app.use(cookieParser())
 app.use(logger("dev"));
 app.use(bodyParser());
+app.use(express.static(__dirname + '/public'))
 
 const mongoose = require("mongoose");
 const User = require("./models/Users");
@@ -21,7 +22,7 @@ const db = mongoose.connection;
 db.on("error", function(error){
     console.error(error);
 });
-
+app.use("/uploads", express.static("uploads"))
 // app.use(function(req, res, next){
 //     res.header("Access-Control-Allow-Origin", "*")
 //     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept")

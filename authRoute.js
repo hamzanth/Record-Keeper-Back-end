@@ -84,7 +84,7 @@ router.put("/:uid/update", async function(req, res, next){
             user.image = image
             try{
                 user.save()
-                res.status(200).json({message: "Successfully Updated customer",user: user})
+                res.status(200).json({message: "Successfully Updated customer", user: user})
             }
             catch(err){
                 next(err)
@@ -95,6 +95,15 @@ router.put("/:uid/update", async function(req, res, next){
         }
     }
 
+})
+
+router.put("/debt-limit-update", async function(req, res, next){
+    const debtLimit = req.body.debt
+    await Users.updateMany({}, {$set: {debtLimit: debtLimit}})
+    .then(users => {
+        res.status(200).json({message: "Successfully Updated Debt", users: users})
+    })
+    .catch(error => next(error))
 })
 
 router.delete("/:uid/delete", async function(req, res, next){

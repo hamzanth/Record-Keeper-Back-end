@@ -60,6 +60,10 @@ const userSChema = new mongoose.Schema({
         type: Number,
         default: 0
     },
+    debtLimit: {
+        type: Number,
+        default: 1000
+    },
     timeLine: [prodSchema]
 });
 
