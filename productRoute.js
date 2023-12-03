@@ -44,6 +44,9 @@ router.post("/", upload.single('image'), async function(req, res, next){
     const price = req.body.price
     const quantity = req.body.quantity
     const category = req.body.category
+    const priceDescription = req.body.priceDescription
+    const quantityDescription = req.body.quantityDescription
+    const quantityRange = req.body.quantityRange
 
     // console.log(name, price, quantity, image)
 
@@ -52,6 +55,9 @@ router.post("/", upload.single('image'), async function(req, res, next){
         price: price,
         quantity: quantity,
         category: category,
+        priceDescription: priceDescription,
+        quantityDescription: quantityDescription,
+        quantityRange: quantityRange,
         image: req.file ? {
             data: fs.readFileSync('uploads/' + req.file.filename),
             conteType: 'image/jpg',
@@ -72,6 +78,9 @@ router.put("/:pid/update", upload.single("image"), async function(req, res, next
     const price = req.body.price
     const quantity = req.body.quantity
     const category = req.body.category
+    const priceDescription = req.body.priceDescription
+    const quantityDescription = req.body.quantityDescription
+    const quantityRange = req.body.quantityRange
     console.log(req.file)
     // const image = req.body.image
 
@@ -85,6 +94,9 @@ router.put("/:pid/update", upload.single("image"), async function(req, res, next
         product.price = price
         product.quantity = quantity
         product.category = category
+        product.priceDescription = priceDescription
+        product.quantityDescription = quantityDescription
+        product.quantityRange = quantityRange
         product.image = {
             data: fs.readFileSync('uploads/' + req.file.filename),
             conteType: 'image/jpg',
@@ -104,6 +116,9 @@ router.put("/:pid/update", upload.single("image"), async function(req, res, next
             product.price = price
             product.quantity = quantity
             product.category = category
+            product.priceDescription = priceDescription
+            product.quantityDescription = quantityDescription
+            product.quantityRange = quantityRange
             await product.save()
             res.status(201).json({message: "Successfully Updated", product: product})
             }
@@ -241,6 +256,27 @@ router.put("/makedeposit", async function(req, res, next){
         try{
             await user.save()
             res.status(201).json({message: "Deposit made successfully", user: user})
+        }
+        catch(error){
+            next(error)
+        }
+    }
+})
+
+router.put("/makepayment", async function(req, res, next){
+    const userId = req.body.id
+    const transObj = req.body.newTransaction
+    const user = await Users.findById(userId)
+    if(!user){
+        const error = new Error("User not found")
+        error.status = 404
+        next(error)
+    }
+    else{
+        user.timeLine.push(transObj)
+        try{
+            await user.save()
+            res.status(201).json({message: "Payment made successfully", user: user})
         }
         catch(error){
             next(error)
