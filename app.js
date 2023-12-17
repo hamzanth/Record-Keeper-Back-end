@@ -17,7 +17,8 @@ app.use(express.static(__dirname + '/public'))
 
 const mongoose = require("mongoose");
 const User = require("./models/Users");
-mongoose.connect("mongodb+srv://irekpitaanthony10:otVHGw3ieF9EBhm3@cluster0.3v3pcse.mongodb.net/RecordKeeperDB?retryWrites=true&w=majority");
+// mongoose.connect("mongodb+srv://irekpitaanthony10:otVHGw3ieF9EBhm3@cluster0.3v3pcse.mongodb.net/RecordKeeperDB?retryWrites=true&w=majority");
+mongoose.connect("mongodb://127.0.0.1:27017/AbdLogistics")
 const db = mongoose.connection;
 db.on("error", function(error){
     console.error(error);

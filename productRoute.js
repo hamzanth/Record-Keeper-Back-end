@@ -81,7 +81,7 @@ router.put("/:pid/update", upload.single("image"), async function(req, res, next
     const priceDescription = req.body.priceDescription
     const quantityDescription = req.body.quantityDescription
     const quantityRange = req.body.quantityRange
-    console.log(req.file)
+    // console.log(req.file)
     // const image = req.body.image
 
     // const product = await Products.findById(productId)
@@ -89,7 +89,7 @@ router.put("/:pid/update", upload.single("image"), async function(req, res, next
     if (req.file){
         try{
         const product = await Products.findById(productId)
-        fs.unlinkSync(__dirname + '/uploads/' + product.image.filename)
+        // fs.unlinkSync(__dirname + '/uploads/' + product.image.filename)
         product.name = name
         product.price = price
         product.quantity = quantity
@@ -264,7 +264,7 @@ router.put("/makedeposit", async function(req, res, next){
 })
 
 router.put("/makepayment", async function(req, res, next){
-    const userId = req.body.id
+    const userId = req.body.id 
     const transObj = req.body.newTransaction
     const user = await Users.findById(userId)
     if(!user){
